@@ -1,1 +1,0 @@
-# Burgershotcalc.github.io
