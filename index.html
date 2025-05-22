@@ -38,15 +38,11 @@
       display: flex;
       flex-direction: column;
     }
-    aside h1 {
-      display: none;
-    }
-    .logo {
+    aside .logo {
       max-width: 180px;
-      height: auto;
-      display: block;
       margin: 0 auto 1rem;
     }
+    aside h1 { display: none; }
     .nav button {
       background: none;
       border: 2px solid var(--primary-blue);
@@ -82,7 +78,7 @@
       overflow-y: auto;
     }
     .content.active { display: flex; gap: 20px; }
-    /* Point of Sale View */
+    /* POS view */
     #pos { gap: 20px; }
     .menu {
       display: grid;
@@ -149,89 +145,39 @@
       cursor: pointer;
       font-size: 1.1rem;
     }
-    .summary {
-      margin-top: 10px;
-      text-align: right;
-    }
+    .summary { margin-top: 10px; text-align: right; }
     .summary label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 0.9rem;
-      color: #aaa;
-      text-align: left;
+      display: block; margin-bottom: 4px; font-size: 0.9rem; color: #aaa; text-align: left;
     }
     .summary input {
-      width: 100%;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #444;
-      color: #fff;
-      background: rgba(0,0,0,0.6);
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      text-align: center;
+      width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #444;
+      color: #fff; background: rgba(0,0,0,0.6); margin-bottom: 8px; font-size: 0.9rem; text-align: center;
     }
     .summary .total { font-size: 1.4rem; margin-bottom: 8px; }
     .summary button {
-      padding: 12px;
-      background: var(--primary-red);
-      border: none;
-      border-radius: 6px;
-      color: #fff;
-      cursor: pointer;
-      font-weight: bold;
-      width: 100%;
+      padding: 12px; background: var(--primary-red); border: none;
+      border-radius: 6px; color: #fff; cursor: pointer; font-weight: bold; width: 100%;
     }
     .summary button:hover { background: darkred; }
     /* Sales Log & Employees */
     .log, .employees { flex-direction: column; }
-    /* Employee panel styling */
-    #employees {
-      background: var(--panel-bg);
-      border: 2px solid transparent;
-      border-image: linear-gradient(90deg,var(--primary-blue),var(--primary-red)) 1;
-      border-radius: 12px;
-      padding: 20px;
-      flex: 2;
-      /* removed display:flex to inherit .content default (hidden when not active) */
-    }
-    #employees ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      width: 100%;
-    }
-    #employees li {
-      background: rgba(0,0,0,0.6);
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-    }
     .log h2, .employees h2 { color: var(--primary-blue); margin-bottom: 12px; }
     #purchaseLog div {
       background: var(--panel-bg);
       border-left: 4px solid var(--primary-blue);
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 6px;
-      color: #fff;
+      padding: 10px; margin-bottom: 8px; border-radius: 6px; color: #fff;
     }
     #purchaseLog div strong { display: block; color: var(--primary-blue); margin-bottom: 4px; }
     #employees ul { list-style: none; }
     #employees li {
       background: var(--panel-bg);
-      padding: 8px;
-      margin-bottom: 6px;
-      border-radius: 4px;
-      color: #fff;
+      padding: 8px; margin-bottom: 6px; border-radius: 4px; color: #fff;
     }
   </style>
 </head>
 <body>
   <aside>
-    <img src="sandbox:/mnt/data/burgershot.png" alt="Burger Shot Logo" class="logo" />
+    <img src="burgershot.png" alt="Burger Shot Logo" class="logo"" alt="Burger Shot Logo" class="logo" />
     <div class="nav">
       <button id="btnPos" class="active" onclick="switchTab('pos')">Point of Sale</button>
       <button id="btnLog" onclick="switchTab('log')">Sales Log</button>
@@ -246,7 +192,7 @@
         <h2>Cart</h2>
         <div class="cart-list" id="cartItems"></div>
         <div class="summary">
-          <label for="discount">Enter Discount % (0-100) in box below:</label>
+          <label for="discount">Enter Discount % (0-100):</label>
           <input id="discount" type="number" min="0" max="100" placeholder="Discount % (0-100)" />
           <div class="total">Total: $<span id="total">0.00</span></div>
           <button id="checkoutBtn">Checkout</button>
@@ -289,6 +235,29 @@
       const discountInput = document.getElementById('discount');
       const purchaseLog = document.getElementById('purchaseLog');
 
+      // Load or initialize sales log
+      let salesLogData = JSON.parse(localStorage.getItem('salesLog')) || [];
+      salesLogData.forEach(sale => displaySale(sale));
+
+      function displaySale({ items, total, timestamp, discount }) {
+        const entry = document.createElement('div');
+        entry.innerHTML = `
+          <strong>${timestamp}</strong><br>
+          ${items.map(i => `${i.name} x${i.qty}`).join(', ')}<br>
+          Discount: ${discount}%<br>
+          <b>Total: $${total}</b>
+        `;
+        purchaseLog.prepend(entry);
+      }
+
+      function logSale(order, total, discount) {
+        const timestamp = new Date().toLocaleString();
+        const sale = { items: order, total, timestamp, discount };
+        salesLogData.unshift(sale);
+        localStorage.setItem('salesLog', JSON.stringify(salesLogData));
+        displaySale(sale);
+      }
+
       function renderCart() {
         cartItems.innerHTML = '';
         let total = 0;
@@ -296,47 +265,57 @@
         d = Math.max(0, Math.min(100, d));
         discountInput.value = d;
         for (let key in cart) {
-          const item = cart[key];
-          if (item.qty > 0) {
+          const it = cart[key];
+          if (it.qty > 0) {
             const row = document.createElement('div'); row.className = 'cart-item';
             row.innerHTML = `
-              <div class="cart-text">${item.name} x${item.qty}</div>
-              <div class="cart-line-price">$${(item.price * item.qty).toFixed(2)}</div>
+              <div class="cart-text">${it.name} x${it.qty}</div>
+              <div class="cart-line-price">$${(it.price * it.qty).toFixed(2)}</div>
               <button onclick="removeItem('${key}')">🗑</button>
             `;
             cartItems.appendChild(row);
-            total += item.price * item.qty;
+            total += it.price * it.qty;
           }
         }
         total *= (1 - d/100);
         totalDisplay.textContent = total.toFixed(2);
       }
-      window.removeItem = function(key) { if(cart[key]&&cart[key].qty>0){cart[key].qty--; renderCart();}};
-      window.switchTab = function(tab) {
+
+      window.removeItem = key => { if (cart[key]?.qty > 0) { cart[key].qty--; renderCart(); }};
+      window.switchTab = tab => {
         document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
         document.getElementById('btn' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
         document.getElementById(tab).classList.add('active');
       };
+
       discountInput.addEventListener('input', renderCart);
       document.getElementById('checkoutBtn').addEventListener('click', () => {
-        const order = []; let sum = 0;
-        for (let key in cart) { if(cart[key].qty>0){ order.push({ name:key,qty:cart[key].qty }); sum+=cart[key].qty*cart[key].price; delete cart[key]; }}
-        let d = parseFloat(discountInput.value)||0; d=Math.max(0,Math.min(100,d)); discountInput.value=d;
-        sum *= (1-d/100);
-        if(order.length){ const entry = document.createElement('div'); const ts=new Date().toLocaleString(); const items=order.map(i=>`${i.name} x${i.qty}`).join(', ');
-          entry.innerHTML = `<strong>${ts}</strong><br>${items}<br><b>Total: $${sum.toFixed(2)}</b>`;
-          purchaseLog.prepend(entry);
-          alert('✅ Order completed and logged!'); }
+        const order = [];
+        let sum = 0;
+        for (let key in cart) {
+          if (cart[key].qty > 0) {
+            order.push({ name: key, qty: cart[key].qty });
+            sum += cart[key].price * cart[key].qty;
+            delete cart[key];
+          }
+        }
+        let d = parseFloat(discountInput.value) || 0; d = Math.max(0, Math.min(100, d)); discountInput.value = d;
+        sum *= (1 - d/100);
+        if (order.length) { logSale(order, sum.toFixed(2), d); alert('✅ Order completed and logged!'); }
         renderCart();
       });
-      // build menu
+
+      // Build menu
       menuData.forEach(item => {
         const div = document.createElement('div'); div.className='item';
-        div.innerHTML = `<strong>${item.name}</strong><div class="price-pill">${item.isMeal?'Meal':'$'+item.price}</div>`;
+        div.innerHTML = `
+          <strong>${item.name}</strong>
+          <div class="price-pill">${item.isMeal?'Meal':'$'+item.price}</div>
+        `;
         div.addEventListener('click', () => {
-          if(item.isMeal) item.includes.forEach(i=>{ if(!cart[i.name]) cart[i.name]={...menuData.find(x=>x.name===i.name),qty:0}; cart[i.name].qty+=i.qty; });
-          else { if(!cart[item.name]) cart[item.name]={...item,qty:0}; cart[item.name].qty++; }
+          if (item.isMeal) item.includes.forEach(i => { if (!cart[i.name]) cart[i.name] = { ...menuData.find(x => x.name===i.name), qty:0 }; cart[i.name].qty += i.qty; });
+          else { if (!cart[item.name]) cart[item.name] = {...item,qty:0}; cart[item.name].qty++; }
           renderCart();
         });
         menu.appendChild(div);
