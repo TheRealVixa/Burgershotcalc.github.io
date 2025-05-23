@@ -158,6 +158,21 @@
       text-align: right;
       font-size: 0.9rem;
     }
+    .clear-btn {
+      background: var(--accent);
+      color: var(--text);
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 1rem;
+      transition: background var(--transition);
+    }
+    .clear-btn:hover {
+      background: #ff5f6d;
+    }
     .totals div {
       display: flex;
       justify-content: space-between;
@@ -192,6 +207,7 @@
         />
         <div class="discount-value" id="discount-val">0%</div>
       </div>
+      <button id="clear-btn" class="clear-btn">Clear All</button>
       <div class="totals-panel" id="order-summary">
         <h2>Order Summary</h2>
         <div class="totals">
@@ -213,7 +229,6 @@
       const DRINK_COST         = DRINK_UNIT_COST * 4;
       const SMOOTHIE_COST      = SMOOTHIE_UNIT_COST * 4;
 
-      // Original meal prices
       const meals = [
         ['Hamburger Meal',150],
         ['Cheeseburger Meal',200],
@@ -225,13 +240,12 @@
         ['Happy Meal',1500]
       ];
 
-      // Generate individual items (4-pack → single units)
       const items = meals
         .slice(0,6)
         .map(([name, price]) => {
           const unitName = name.replace(/ Meal$/,'').trim();
           const packCost = name.startsWith('Veggie') ? SMOOTHIE_COST : DRINK_COST;
-          const unitPrice= (price - packCost) / 4;
+          const unitPrice = (price - packCost) / 4;
           return [unitName, unitPrice];
         })
         .concat([
@@ -244,19 +258,20 @@
       const grid      = document.getElementById('items-grid');
       const discRange = document.getElementById('discount-range');
       const discVal   = document.getElementById('discount-val');
+      const clearBtn  = document.getElementById('clear-btn');
       const subEl     = document.getElementById('subtotal');
       const discAmtEl = document.getElementById('discount-amt');
       const finalEl   = document.getElementById('final');
       const fmt       = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
 
-      // Restore state or init
+      // Restore or init
       const saved = JSON.parse(localStorage.getItem('burgerShot')) || {};
       const quantities = Array.isArray(saved.quantities) && saved.quantities.length === menu.length
         ? saved.quantities
         : Array(menu.length).fill(0);
       let discount = saved.discount || 0;
 
-      // Render all cards
+      // Render menu cards
       const frag = document.createDocumentFragment();
       menu.forEach(([name, price], idx) => {
         const card = document.createElement('div');
@@ -275,12 +290,13 @@
       });
       grid.appendChild(frag);
 
-      // Init discount UI
+      // Initialize discount UI
       discRange.value = discount;
       discVal.textContent = discount + '%';
       updateSliderBG();
+      recalc();
 
-      // Qty button handler
+      // Quantity buttons via delegation
       grid.addEventListener('click', e => {
         const btn = e.target.closest('button');
         if (!btn) return;
@@ -296,7 +312,7 @@
         recalc();
       });
 
-      // Discount slider handler
+      // Discount slider
       discRange.addEventListener('input', () => {
         discount = +discRange.value;
         discVal.textContent = discount + '%';
@@ -305,14 +321,28 @@
         recalc();
       });
 
+      // Clear all selections
+      clearBtn.addEventListener('click', () => {
+        // reset quantities
+        quantities.fill(0);
+        grid.querySelectorAll('input[type="number"]').forEach(inp => inp.value = 0);
+        // reset discount
+        discount = 0;
+        discRange.value = 0;
+        discVal.textContent = '0%';
+        updateSliderBG();
+        saveState();
+        recalc();
+      });
+
       function recalc() {
-        const subtotal = menu.reduce((sum, [, p], i) =>
-          sum + p * (quantities[i] || 0), 0
+        const sub = menu.reduce((sum, [, price], i) =>
+          sum + price * (quantities[i] || 0), 0
         );
-        const damt = subtotal * discount / 100;
-        subEl.textContent     = fmt.format(subtotal);
+        const damt = sub * discount / 100;
+        subEl.textContent     = fmt.format(sub);
         discAmtEl.textContent = `- ${fmt.format(damt)}`;
-        finalEl.textContent   = fmt.format(subtotal - damt);
+        finalEl.textContent   = fmt.format(sub - damt);
       }
       function updateSliderBG() {
         discRange.style.setProperty('--pct', discount + '%');
@@ -322,8 +352,6 @@
           JSON.stringify({ quantities, discount })
         );
       }
-
-      recalc();
     })();
   </script>
 </body>
