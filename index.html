@@ -2,356 +2,208 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>💜 Burger Shot Calculator</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
-    rel="stylesheet"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🍔 Burger Shot Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #121212;
-      --card-bg: #1f1f1f;
-      --header-bg: #2a2a2a;
-      --panel-bg: #292929;
+      --panel-bg: #1f1f1f;
       --accent: #e63946;
-      --text: #f1f1f1;
-      --muted: #888;
-      --border: #333;
+      --text-primary: #e0e0e0;
+      --text-secondary: #777777;
+      --radius: 12px;
+      --transition: 0.25s ease;
       --font: 'Poppins', sans-serif;
-      --radius: 8px;
-      --transition: 0.3s ease;
+      --pct: 0%;
     }
-    * { box-sizing: border-box }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       background: var(--bg);
+      color: var(--text-primary);
       font-family: var(--font);
-      color: var(--text);
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 1rem;
+      height: 100vh;
     }
     .calculator {
-      display: flex;
-      flex-wrap: wrap;
-      width: 100%;
-      max-width: 900px;
-      background: var(--card-bg);
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 2rem;
+      background: var(--panel-bg);
       border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.7);
-    }
-    .menu {
-      flex: 2 1 500px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
+      padding: 2rem;
+      width: 90%;
+      max-width: 1000px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
     }
     .header {
+      grid-column: 1 / -1;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: 2rem;
       font-weight: 700;
       color: var(--accent);
-      background: var(--header-bg);
-      padding: 1rem;
-      border-radius: var(--radius) var(--radius) 0 0;
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
     }
     .items-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+      grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
       gap: 1rem;
-      margin-top: 1rem;
-      flex: 1;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 0.5rem;
     }
     .item-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--border);
+      background: #2a2a2a;
       border-radius: var(--radius);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+      transition: transform var(--transition), background var(--transition);
+      cursor: pointer;
+    }
+    .item-card:hover {
+      background: #333;
+      transform: translateY(-5px);
+    }
+    .item-card h3 { margin: 0 0 0.5rem; font-weight: 500; }
+    .price { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+    .qty-control { display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+    .qty-control button {
+      width: 32px; height: 32px;
+      border: none; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      font-size: 1.2rem; cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .qty-control button:hover { background: #c5323c; transform: scale(1.1); }
+    .qty-control input {
+      width: 40px; border: none; background: transparent;
+      color: var(--text-primary); font-size: 1rem; text-align: center;
+    }
+    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .panel { background: #2a2a2a; border-radius: var(--radius); padding: 1rem; }
+    .panel h2 { margin: 0 0 0.5rem; font-weight: 500; color: var(--accent); }
+    /* Improved discount slider styling */
+    .discount-slider input[type=range] {
+      width: 100%; -webkit-appearance: none; height: 8px;
+      background: linear-gradient(90deg, var(--accent) var(--pct), var(--text-secondary) var(--pct));
+      border-radius: 4px; outline: none; transition: background var(--transition);
+    }
+    .discount-slider input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px;
+      background: var(--accent); border: 2px solid var(--panel-bg);
+      border-radius: 50%; cursor: pointer;
       transition: transform var(--transition);
     }
-    .item-card:hover { transform: translateY(-4px) }
-    .item-card h3 {
-      font-size: 1rem;
-      font-weight: 500;
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-    .qty-control {
-      display: flex;
-      align-items: center;
-      background: var(--header-bg);
-      border: 1px solid var(--accent);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 0.5rem;
-    }
-    .qty-control button {
-      width: 32px;
-      height: 32px;
-      border: none;
-      background: var(--accent);
-      color: var(--text);
-      cursor: pointer;
-      font-size: 1.2rem;
-      transition: background var(--transition);
-    }
-    .qty-control button:hover,
-    .qty-control button:focus {
-      background: #ff5f6d;
-      outline: none;
-    }
-    .qty-control input[type="number"] {
-      width: 50px;
-      border: none;
-      background: transparent;
-      color: var(--text);
-      text-align: center;
-      font-size: 1rem;
-    }
-    .price {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-    .sidebar {
-      flex: 1 1 250px;
-      background: var(--header-bg);
-      padding: 1rem;
-      border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-    }
-    .discount-panel,
-    .totals-panel {
-      background: var(--panel-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    .discount-panel h2,
-    .totals-panel h2 {
-      margin: 0 0 0.75rem;
-      font-size: 1.2rem;
-      color: var(--accent);
-      text-align: center;
-    }
-    .discount-panel input[type='range'] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      background: var(--border);
-      border-radius: 4px;
-      background-image: linear-gradient(var(--accent),var(--accent));
-      background-size: var(--pct) 100%;
-      background-repeat: no-repeat;
-      transition: background-size var(--transition);
-    }
+    .discount-slider input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
     .discount-value {
-      text-align: right;
-      font-size: 0.9rem;
+      text-align: right; font-size: 0.85rem; color: var(--text-secondary);
+      margin-top: 0.25rem;
     }
-    .clear-btn {
-      background: var(--accent);
-      color: var(--text);
-      border: none;
-      border-radius: var(--radius);
-      padding: 0.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      width: 100%;
-      margin-bottom: 1rem;
-      transition: background var(--transition);
+    .totals { display: flex; flex-direction: column; gap: 0.5rem; }
+    .totals div { display: flex; justify-content: space-between; font-size: 0.95rem; }
+    .total { font-weight: 600; font-size: 1.2rem; color: var(--accent); }
+    .btn { padding: 0.75rem; border: none; border-radius: var(--radius); font-size: 1rem;
+      cursor: pointer; transition: background var(--transition), transform var(--transition);
     }
-    .clear-btn:hover {
-      background: #ff5f6d;
-    }
-    .totals div {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-    }
-    .total {
-      font-weight: 700;
-      color: var(--accent);
-      font-size: 1.2rem;
-    }
-    .footer {
-      margin-top: auto;
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
+    .checkout-btn { background: var(--accent); color: #fff; font-weight: 600; }
+    .checkout-btn:hover { background: #c5323c; transform: scale(1.03); }
+    .clear-btn { background: transparent; color: var(--accent); font-weight: 500; }
+    .clear-btn:hover { background: rgba(255,255,255,0.1); }
   </style>
 </head>
 <body>
-  <main class="calculator" aria-label="Burger Shot order calculator">
-    <section class="menu">
-      <header class="header">💜 Burger Shot Calculator</header>
-      <div class="items-grid" id="items-grid" role="list"></div>
-    </section>
-    <aside class="sidebar" aria-labelledby="order-summary">
-      <div class="discount-panel">
-        <h2 id="discount-label">Discount</h2>
-        <input
-          type="range"
-          id="discount-range"
-          aria-labelledby="discount-label"
-          min="0" max="100" step="1" value="0"
-        />
+  <div class="calculator">
+    <div>
+      <div class="header">🍔 Burger Shot Calculator</div>
+      <div class="items-grid" id="items-grid"></div>
+    </div>
+    <aside class="sidebar">
+      <div class="panel discount-slider">
+        <h2>Discount</h2>
+        <input type="range" id="discount-range" min="0" max="100" step="1">
         <div class="discount-value" id="discount-val">0%</div>
       </div>
-      <button id="clear-btn" class="clear-btn">Clear All</button>
-      <div class="totals-panel" id="order-summary">
+      <div class="panel">
         <h2>Order Summary</h2>
         <div class="totals">
-          <div><span>Subtotal</span><span id="subtotal">$0.00</span></div>
-          <div><span>Discount</span><span id="discount-amt">-$0.00</span></div>
-          <div class="total"><span>Total</span><span id="final">$0.00</span></div>
+          <div><span>Subtotal</span><span id="subtotal">$0</span></div>
+          <div><span>Discount</span><span id="discount-amt">-$0</span></div>
+          <div class="total"><span>Total</span><span id="final">$0</span></div>
         </div>
       </div>
-      <footer class="footer">Made by Vixa</footer>
+      <button class="btn checkout-btn" id="checkout-btn">Checkout</button>
+      <button class="btn clear-btn" id="clear-btn">Clear All</button>
     </aside>
-  </main>
-
+  </div>
   <script>
     (() => {
-      'use strict';
-
-      const DRINK_UNIT_COST    = 20;
-      const SMOOTHIE_UNIT_COST = 25;
-      const DRINK_COST         = DRINK_UNIT_COST * 4;
-      const SMOOTHIE_COST      = SMOOTHIE_UNIT_COST * 4;
-
-      const meals = [
-        ['Hamburger Meal',150],
-        ['Cheeseburger Meal',200],
-        ['Bacon & Cheese Meal',250],
-        ['Bacon, Egg & Cheese Meal',300],
-        ['Veggie Meal',150],
-        ['Nugget Meal',150],
-        ['Combo Meal',250],
-        ['Happy Meal',1500]
+      const DRINK = 20, SMOOTHIE = 25;
+      const DRINK_PACK = DRINK * 4, SMOOTHIE_PACK = SMOOTHIE * 4;
+      const INCREASE = 1.1;
+      const baseMeals = [
+        ['Hamburger Meal', 150], ['Cheeseburger Meal', 200], ['Bacon & Cheese Meal', 250],
+        ['Bacon, Egg & Cheese Meal', 300], ['Veggie Meal', 150], ['Nugget Meal', 150]
       ];
+      const meals = baseMeals.map(([name, price]) => {
+        const newPrice = Math.ceil(price * INCREASE);
+        const pack = name.includes('Veggie') ? SMOOTHIE_PACK : DRINK_PACK;
+        const unit = Math.ceil((newPrice - pack) / 4);
+        return [name, newPrice, unit];
+      });
+      const items = meals.map(([name,,unit]) => [name.replace(/ Meal$/, ''), unit])
+        .concat([['Drink', DRINK], ['Avocado Smoothie', SMOOTHIE]]);
+      const menu = meals.map(([n,p]) => [n,p]).concat(items);
 
-      const items = meals
-        .slice(0,6)
-        .map(([name, price]) => {
-          const unitName = name.replace(/ Meal$/,'').trim();
-          const packCost = name.startsWith('Veggie') ? SMOOTHIE_COST : DRINK_COST;
-          const unitPrice = (price - packCost) / 4;
-          return [unitName, unitPrice];
-        })
-        .concat([
-          ['Drink', DRINK_UNIT_COST],
-          ['Avocado Smoothie', SMOOTHIE_UNIT_COST]
-        ]);
-
-      const menu = meals.concat(items);
-
-      const grid      = document.getElementById('items-grid');
-      const discRange = document.getElementById('discount-range');
-      const discVal   = document.getElementById('discount-val');
-      const clearBtn  = document.getElementById('clear-btn');
-      const subEl     = document.getElementById('subtotal');
+      const grid = document.getElementById('items-grid');
+      const discR = document.getElementById('discount-range');
+      const discV = document.getElementById('discount-val');
+      const subEl = document.getElementById('subtotal');
       const discAmtEl = document.getElementById('discount-amt');
-      const finalEl   = document.getElementById('final');
-      const fmt       = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
+      const finalEl = document.getElementById('final');
+      const clearBtn = document.getElementById('clear-btn');
+      const checkoutBtn = document.getElementById('checkout-btn');
+      const fmt = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
 
-      // Restore or init
       const saved = JSON.parse(localStorage.getItem('burgerShot')) || {};
-      const quantities = Array.isArray(saved.quantities) && saved.quantities.length === menu.length
-        ? saved.quantities
-        : Array(menu.length).fill(0);
-      let discount = saved.discount || 0;
+      const quantities = Array.isArray(saved.quantities) && saved.quantities.length===menu.length
+        ? saved.quantities : Array(menu.length).fill(0);
+      let discount = saved.discount||0;
 
-      // Render menu cards
-      const frag = document.createDocumentFragment();
       menu.forEach(([name, price], idx) => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.setAttribute('role','listitem');
-        card.innerHTML = `
-          <h3>${name}</h3>
-          <div class="qty-control">
-            <button type="button" class="minus" aria-label="Remove one ${name}">–</button>
-            <input type="number" min="0" step="1" value="${quantities[idx]}" aria-label="${name} quantity" />
-            <button type="button" class="plus" aria-label="Add one ${name}">+</button>
-          </div>
-          <div class="price">${fmt.format(price)}</div>
-        `;
-        frag.appendChild(card);
-      });
-      grid.appendChild(frag);
-
-      // Initialize discount UI
-      discRange.value = discount;
-      discVal.textContent = discount + '%';
-      updateSliderBG();
-      recalc();
-
-      // Quantity buttons via delegation
-      grid.addEventListener('click', e => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        const plus = btn.classList.contains('plus');
-        const card = btn.closest('.item-card');
-        const idx  = Array.from(grid.children).indexOf(card);
-        const inp  = card.querySelector('input');
-        let v = parseInt(inp.value,10) || 0;
-        v = plus ? v + 1 : Math.max(0, v - 1);
-        inp.value = v;
-        quantities[idx] = v;
-        saveState();
-        recalc();
+        const card=document.createElement('div');card.className='item-card';
+        card.innerHTML=`<h3>${name}</h3><div class="price">${fmt.format(price)}</div>`+
+          `<div class="qty-control"><button class="minus">–</button>`+
+          `<input type="number" min="0" value="${quantities[idx]}" />`+
+          `<button class="plus">+</button></div>`;
+        grid.appendChild(card);
       });
 
-      // Discount slider
-      discRange.addEventListener('input', () => {
-        discount = +discRange.value;
-        discVal.textContent = discount + '%';
-        updateSliderBG();
-        saveState();
-        recalc();
-      });
-
-      // Clear all selections
-      clearBtn.addEventListener('click', () => {
-        // reset quantities
-        quantities.fill(0);
-        grid.querySelectorAll('input[type="number"]').forEach(inp => inp.value = 0);
-        // reset discount
-        discount = 0;
-        discRange.value = 0;
-        discVal.textContent = '0%';
-        updateSliderBG();
-        saveState();
-        recalc();
-      });
-
-      function recalc() {
-        const sub = menu.reduce((sum, [, price], i) =>
-          sum + price * (quantities[i] || 0), 0
-        );
-        const damt = sub * discount / 100;
-        subEl.textContent     = fmt.format(sub);
-        discAmtEl.textContent = `- ${fmt.format(damt)}`;
-        finalEl.textContent   = fmt.format(sub - damt);
+      function update() {
+        const subtotal = menu.reduce((sum,[,price],i)=>sum+price*quantities[i],0);
+        const raw = Math.ceil(subtotal*(discount/100));
+        subEl.textContent=fmt.format(subtotal);
+        discAmtEl.textContent='-'+fmt.format(raw);
+        finalEl.textContent=fmt.format(subtotal-raw);
+        document.documentElement.style.setProperty('--pct',discount+'%');
       }
-      function updateSliderBG() {
-        discRange.style.setProperty('--pct', discount + '%');
-      }
-      function saveState() {
-        localStorage.setItem('burgerShot',
-          JSON.stringify({ quantities, discount })
-        );
-      }
+
+      discR.value=discount;discV.textContent=`${discount}%`;update();
+
+      grid.addEventListener('click',e=>{
+        const btn=e.target.closest('button');if(!btn)return;
+        const idx=[...grid.children].indexOf(btn.closest('.item-card'));
+        const inp=grid.children[idx].querySelector('input');
+        let v=+inp.value||0;v=btn.classList.contains('plus')?v+1:Math.max(0,v-1);
+        quantities[idx]=v;inp.value=v;save();update();
+      });
+      discR.addEventListener('input',()=>{discount=+discR.value;discV.textContent=`${discount}%`;save();update();});
+      clearBtn.addEventListener('click',()=>{quantities.fill(0);grid.querySelectorAll('input').forEach(i=>i.value=0);
+        discount=0;discR.value=0;discV.textContent='0%';save();update();});
+      checkoutBtn.addEventListener('click',()=>{clearBtn.click();alert('Order placed! Thanks!');});
+      function save(){localStorage.setItem('burgerShot',JSON.stringify({quantities,discount}));}
     })();
   </script>
 </body>
