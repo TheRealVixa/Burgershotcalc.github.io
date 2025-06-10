@@ -10,23 +10,23 @@
       --bg: #121212;
       --panel-bg: #1f1f1f;
       --accent: #e63946;
+      --accent-light: #ff5b6b;
       --text-primary: #e0e0e0;
       --text-secondary: #777777;
       --radius: 12px;
       --transition: 0.25s ease;
       --font: 'Poppins', sans-serif;
-      --pct: 0%;
+      --slider-percent: 0%;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
-      background: var(--bg);
+      background: linear-gradient(135deg, #191919, #121212);
       color: var(--text-primary);
       font-family: var(--font);
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
     .calculator {
       display: grid;
@@ -35,95 +35,112 @@
       background: var(--panel-bg);
       border-radius: var(--radius);
       padding: 2rem;
-      width: 90%;
-      max-width: 1000px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+      width: 95%;
+      max-width: 1200px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+      animation: fadeIn 0.5s ease;
     }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity:1; transform: translateY(0);} }
     .header {
       grid-column: 1 / -1;
       text-align: center;
-      font-size: 2rem;
+      font-size: 3rem;
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
     }
-    .items-grid {
+    .items-section { margin-bottom: 1.5rem; }
+    .items-section h2 {
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      padding-left: 0.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .grid-inner {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-      gap: 1rem;
-      max-height: 60vh;
+      grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+      gap: 1.5rem;
+      max-height: 40vh;
       overflow-y: auto;
       padding-right: 0.5rem;
     }
     .item-card {
-      background: #2a2a2a;
+      background: linear-gradient(145deg, #2a2a2a, #242424);
       border-radius: var(--radius);
       padding: 1rem;
       text-align: center;
-      transition: transform var(--transition), background var(--transition);
+      transition: transform var(--transition), box-shadow var(--transition);
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
     .item-card:hover {
-      background: #333;
-      transform: translateY(-5px);
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8);
     }
-    .item-card h3 { margin: 0 0 0.5rem; font-weight: 500; }
+    .item-card h3 { margin: 0 0 0.5rem; font-weight: 500; font-size: 1.1rem; }
     .price { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
     .qty-control { display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
     .qty-control button {
-      width: 32px; height: 32px;
+      width: 34px; height: 34px;
       border: none; border-radius: 50%;
-      background: var(--accent); color: #fff;
+      background: var(--accent);
+      color: #fff;
       font-size: 1.2rem; cursor: pointer;
       transition: background var(--transition), transform var(--transition);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     }
-    .qty-control button:hover { background: #c5323c; transform: scale(1.1); }
+    .qty-control button:hover { background: var(--accent-light); transform: scale(1.15); }
     .qty-control input {
-      width: 40px; border: none; background: transparent;
+      width: 42px; border: none; background: transparent;
       color: var(--text-primary); font-size: 1rem; text-align: center;
     }
-    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
-    .panel { background: #2a2a2a; border-radius: var(--radius); padding: 1rem; }
-    .panel h2 { margin: 0 0 0.5rem; font-weight: 500; color: var(--accent); }
-    /* Improved discount slider styling */
+    .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+    .panel { background: linear-gradient(145deg, #2a2a2a, #242424); border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .panel h2 { margin: 0 0 1rem; font-weight: 500; color: var(--accent); font-size: 1.25rem; }
     .discount-slider input[type=range] {
-      width: 100%; -webkit-appearance: none; height: 8px;
-      background: linear-gradient(90deg, var(--accent) var(--pct), var(--text-secondary) var(--pct));
-      border-radius: 4px; outline: none; transition: background var(--transition);
+      width: 100%; -webkit-appearance: none; height: 10px;
+      background: linear-gradient(90deg, var(--accent) var(--slider-percent), var(--text-secondary) var(--slider-percent));
+      border-radius: 5px; outline: none; transition: background var(--transition);
     }
-    .discount-slider input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 20px; height: 20px;
-      background: var(--accent); border: 2px solid var(--panel-bg);
-      border-radius: 50%; cursor: pointer;
-      transition: transform var(--transition);
-    }
-    .discount-slider input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
-    .discount-value {
-      text-align: right; font-size: 0.85rem; color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-    .totals { display: flex; flex-direction: column; gap: 0.5rem; }
-    .totals div { display: flex; justify-content: space-between; font-size: 0.95rem; }
-    .total { font-weight: 600; font-size: 1.2rem; color: var(--accent); }
+    .discount-value { text-align: right; font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem; }
+    .totals { display: flex; flex-direction: column; gap: 0.75rem; }
+    .totals div { display: flex; justify-content: space-between; font-size: 1rem; }
+    .total { font-weight: 700; font-size: 1.6rem; color: var(--accent); text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
     .btn { padding: 0.75rem; border: none; border-radius: var(--radius); font-size: 1rem;
       cursor: pointer; transition: background var(--transition), transform var(--transition);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     }
     .checkout-btn { background: var(--accent); color: #fff; font-weight: 600; }
-    .checkout-btn:hover { background: #c5323c; transform: scale(1.03); }
+    .checkout-btn:hover { background: var(--accent-light); transform: scale(1.05); }
     .clear-btn { background: transparent; color: var(--accent); font-weight: 500; }
     .clear-btn:hover { background: rgba(255,255,255,0.1); }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1f1f1f; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
   </style>
 </head>
 <body>
   <div class="calculator">
     <div>
       <div class="header">🍔 Burger Shot Calculator</div>
-      <div class="items-grid" id="items-grid"></div>
+      <div class="items-section">
+        <h2>Meals</h2>
+        <div class="grid-inner" id="meals-grid"></div>
+      </div>
+      <div class="items-section">
+        <h2>Items</h2>
+        <div class="grid-inner" id="items-grid"></div>
+      </div>
     </div>
     <aside class="sidebar">
       <div class="panel discount-slider">
         <h2>Discount</h2>
-        <input type="range" id="discount-range" min="0" max="100" step="1">
+        <input type="range" id="discount-range" min="0" max="100" step="1" />
         <div class="discount-value" id="discount-val">0%</div>
       </div>
       <div class="panel">
@@ -140,24 +157,18 @@
   </div>
   <script>
     (() => {
-      const DRINK = 20, SMOOTHIE = 25;
-      const DRINK_PACK = DRINK * 4, SMOOTHIE_PACK = SMOOTHIE * 4;
-      const INCREASE = 1.1;
-      const baseMeals = [
-        ['Hamburger Meal', 150], ['Cheeseburger Meal', 200], ['Bacon & Cheese Meal', 250],
-        ['Bacon, Egg & Cheese Meal', 300], ['Veggie Meal', 150], ['Nugget Meal', 150]
+      const meals = [
+        ['Hamburger Meal', 215], ['Cheeseburger Meal', 270], ['Bacon & Cheese Meal', 325],
+        ['Bacon, Egg & Cheese Meal', 380], ['Veggie Meal', 215], ['Nugget Meal', 215],
+        ['🎉 Happy Meal', 1500], ['👥 Combo Meal', 400]
       ];
-      const meals = baseMeals.map(([name, price]) => {
-        const newPrice = Math.ceil(price * INCREASE);
-        const pack = name.includes('Veggie') ? SMOOTHIE_PACK : DRINK_PACK;
-        const unit = Math.ceil((newPrice - pack) / 4);
-        return [name, newPrice, unit];
-      });
-      const items = meals.map(([name,,unit]) => [name.replace(/ Meal$/, ''), unit])
-        .concat([['Drink', DRINK], ['Avocado Smoothie', SMOOTHIE]]);
-      const menu = meals.map(([n,p]) => [n,p]).concat(items);
-
-      const grid = document.getElementById('items-grid');
+      const items = [
+        ['Hamburger', 72], ['Cheeseburger', 85], ['Bacon & Cheese', 99],
+        ['Bacon, Egg & Cheese', 113], ['Veggie', 67], ['Nugget', 72],
+        ['Drink', 70], ['🥑 Avocado Smoothie', 75]
+      ];
+      const mealGrid = document.getElementById('meals-grid');
+      const itemGrid = document.getElementById('items-grid');
       const discR = document.getElementById('discount-range');
       const discV = document.getElementById('discount-val');
       const subEl = document.getElementById('subtotal');
@@ -167,43 +178,73 @@
       const checkoutBtn = document.getElementById('checkout-btn');
       const fmt = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
 
-      const saved = JSON.parse(localStorage.getItem('burgerShot')) || {};
-      const quantities = Array.isArray(saved.quantities) && saved.quantities.length===menu.length
-        ? saved.quantities : Array(menu.length).fill(0);
-      let discount = saved.discount||0;
+      const menu = meals.concat(items);
+      let quantities = Array(menu.length).fill(0);
+      let discount = 0;
 
-      menu.forEach(([name, price], idx) => {
-        const card=document.createElement('div');card.className='item-card';
-        card.innerHTML=`<h3>${name}</h3><div class="price">${fmt.format(price)}</div>`+
-          `<div class="qty-control"><button class="minus">–</button>`+
-          `<input type="number" min="0" value="${quantities[idx]}" />`+
-          `<button class="plus">+</button></div>`;
-        grid.appendChild(card);
-      });
-
-      function update() {
-        const subtotal = menu.reduce((sum,[,price],i)=>sum+price*quantities[i],0);
-        const raw = Math.ceil(subtotal*(discount/100));
-        subEl.textContent=fmt.format(subtotal);
-        discAmtEl.textContent='-'+fmt.format(raw);
-        finalEl.textContent=fmt.format(subtotal-raw);
-        document.documentElement.style.setProperty('--pct',discount+'%');
+      function createCard(name, price, idx, container) {
+        const card = document.createElement('div'); card.className = 'item-card';
+        card.dataset.idx = idx;
+        card.innerHTML = `
+          <h3>${name}</h3>
+          <div class="price">${fmt.format(price)}</div>
+          <div class="qty-control">
+            <button class="minus">–</button>
+            <input type="number" min="0" value="0" readonly />
+            <button class="plus">+</button>
+          </div>
+        `;
+        container.appendChild(card);
       }
 
-      discR.value=discount;discV.textContent=`${discount}%`;update();
+      meals.forEach(([n,p],i) => createCard(n,p,i,mealGrid));
+      items.forEach(([n,p],i) => createCard(n,p,meals.length+i,itemGrid));
 
-      grid.addEventListener('click',e=>{
-        const btn=e.target.closest('button');if(!btn)return;
-        const idx=[...grid.children].indexOf(btn.closest('.item-card'));
-        const inp=grid.children[idx].querySelector('input');
-        let v=+inp.value||0;v=btn.classList.contains('plus')?v+1:Math.max(0,v-1);
-        quantities[idx]=v;inp.value=v;save();update();
+      function update() {
+        const subtotal = menu.reduce((sum,[,price],i) => sum + price * quantities[i], 0);
+        const rawDisc = Math.round(subtotal * discount / 100);
+        subEl.textContent = fmt.format(subtotal);
+        discAmtEl.textContent = '-' + fmt.format(rawDisc);
+        finalEl.textContent = fmt.format(subtotal - rawDisc);
+        document.documentElement.style.setProperty('--slider-percent', discount + '%');
+      }
+
+      discR.addEventListener('input', () => {
+        discount = +discR.value;
+        discV.textContent = discount + '%';
+        update();
       });
-      discR.addEventListener('input',()=>{discount=+discR.value;discV.textContent=`${discount}%`;save();update();});
-      clearBtn.addEventListener('click',()=>{quantities.fill(0);grid.querySelectorAll('input').forEach(i=>i.value=0);
-        discount=0;discR.value=0;discV.textContent='0%';save();update();});
-      checkoutBtn.addEventListener('click',()=>{clearBtn.click();alert('Order placed! Thanks!');});
-      function save(){localStorage.setItem('burgerShot',JSON.stringify({quantities,discount}));}
+
+      document.querySelectorAll('.item-card').forEach(card => {
+        card.querySelector('.plus').addEventListener('click', () => {
+          const idx = +card.dataset.idx;
+          quantities[idx]++;
+          card.querySelector('input').value = quantities[idx];
+          update();
+        });
+        card.querySelector('.minus').addEventListener('click', () => {
+          const idx = +card.dataset.idx;
+          quantities[idx] = Math.max(0, quantities[idx] - 1);
+          card.querySelector('input').value = quantities[idx];
+          update();
+        });
+      });
+
+      clearBtn.addEventListener('click', () => {
+        quantities.fill(0);
+        discount = 0;
+        discR.value = 0;
+        discV.textContent = '0%';
+        document.querySelectorAll('.item-card input').forEach(i => i.value = 0);
+        update();
+      });
+
+      checkoutBtn.addEventListener('click', () => {
+        alert('Order placed! Thanks!');
+        clearBtn.click();
+      });
+
+      update();
     })();
   </script>
 </body>
